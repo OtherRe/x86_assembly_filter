@@ -125,6 +125,9 @@
 // }
 
 */
+
+extern long add_numbers(unsigned char* output_buffer, unsigned char* input_buffer, int* kernel, int width, int height);
+
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_BITMAP  *image   = NULL;
 ALLEGRO_LOCKED_REGION * region = NULL;
@@ -188,17 +191,24 @@ int main(int argc, char *argv[])
    int widthInBytes = width * 3;
 
    unsigned char* input_buffer;
-   init_input_buffer(input_buffer, height, widthInBytes);
-
+   input_buffer = malloc(height * widthInBytes);
    region=al_lock_bitmap(image, ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA, ALLEGRO_LOCK_READWRITE);
+   memcpy(input_buffer, ((unsigned char*)(region->data)) - (height - 1 ) * widthInBytes, height * widthInBytes);
+
    int kernel[9] = { -1,-1,-1,-1,9,-1,-1,-1,-1}; 
-   filter((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height - 2);
+   // int kernel[9] = { 1,1,1,1,1,1,1,1,1}; 
+
+   int x = sizeof(input_buffer);
+   int z = input_buffer[(height - 200)* widthInBytes];
+   add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height); 
+   // printf("%ld\n",add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height));
    
 	al_unlock_bitmap(image);
+   al_save_bitmap("result.bmp", image);
 	al_draw_bitmap(image, 200, 200,0);
 	al_flip_display();
 
-   al_rest(8);
+   al_rest(10);
    end_program();
 
 	return 0;
@@ -219,16 +229,16 @@ void filter(unsigned char* output_buffer, unsigned char* input_buffer, int* kern
    int c_width;
    int accumulator;
    int kernel_sum;
-   
    int i;
    for(i = 0; i < 9; i++)
       kernel_sum+=kernel[i];
 
-   for(c_height = 0; c_height < height; ++c_height)
+   for(c_height = 2; c_height < height; ++c_height)
    {
       for(c_width = 0; c_width < widthInBytes; ++c_width, --input_buffer, --output_buffer)
       {
          accumulator = 0;
+         
          accumulator = accumulator + (input_buffer[-widthInBytes + 3] * kernel[8]);
          accumulator = accumulator + (input_buffer[-widthInBytes] * kernel[7]);
          accumulator = accumulator + (input_buffer[-widthInBytes - 3] * kernel[6]);

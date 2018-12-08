@@ -3,6 +3,7 @@
 #
  
 CC := gcc # This is the main compiler
+ASM := nasm
 # CC := clang --analyze # and comment out the linker last line for sanity
 SRCDIR := src
 BUILDDIR := build
@@ -12,6 +13,7 @@ SRCEXT := c
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g
+ASMFLAGS := -g -f elf64
 LIB=`pkg-config --libs allegro-5 allegro_image-5 allegro_dialog-5`
 #INC=-I/usr/include/allegro5
 
@@ -19,10 +21,11 @@ LIB=`pkg-config --libs allegro-5 allegro_image-5 allegro_dialog-5`
 
 $(TARGET): $(OBJECTS)
 	@mkdir -p bin
-	@echo ; $(CC) $(CFLAGS) $^ -o $(TARGET) $(LIB)
+	$(CC) $(CFLAGS) build/add_numbers.o build/glowny.o -o $(TARGET) $(LIB)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo ; $(CC) $(CFLAGS) $(INC) $(LIB) -c -o $@ $<
+	$(ASM) $(ASMFLAGS) -o build/add_numbers.o src/add_numbers.s
 
 clean:
 	@echo " Cleaning..."; 
