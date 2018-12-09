@@ -147,7 +147,7 @@ void init()
       exit(1);
    }
 
-   display = al_create_display(800,600);
+   display = al_create_display(1920,1080);
 
    if(!display) {
       al_show_native_message_box(display, "Error", "Error", "Failed to initialize display!", 
@@ -155,7 +155,7 @@ void init()
       exit(1);
    }
 
-   image = al_load_bitmap("test2.bmp");
+   image = al_load_bitmap("ja.bmp");
 
    if(!image) {
       al_show_native_message_box(display, "Error", "Error", "Failed to load image!", 
@@ -195,20 +195,21 @@ int main(int argc, char *argv[])
    region=al_lock_bitmap(image, ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA, ALLEGRO_LOCK_READWRITE);
    memcpy(input_buffer, ((unsigned char*)(region->data)) - (height - 1 ) * widthInBytes, height * widthInBytes);
 
-   int kernel[9] = { -1,-1,-1,-1,9,-1,-1,-1,-1}; 
-   // int kernel[9] = { 1,1,1,1,1,1,1,1,1}; 
+   // int kernel[9] = { -1,-1,-1,-1,9,-1,-1,-1,-1}; 
+   int kernel[9] = { 1,1,1,1,1,1,1,1,1}; 
+   // int kernel[9] = { 1,2,1,2,-11,2,1,2,1}; 
 
    int x = sizeof(input_buffer);
    int z = input_buffer[(height - 200)* widthInBytes];
-   add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height); 
-   // printf("%ld\n",add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height));
+   // add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height); 
+   printf("%ld\n",add_numbers((unsigned char*)(region->data) - 1,  input_buffer + (height - 1)* widthInBytes - 1, kernel, width, height));
    
 	al_unlock_bitmap(image);
    al_save_bitmap("result.bmp", image);
-	al_draw_bitmap(image, 200, 200,0);
+	al_draw_bitmap(image, 0, 0,0);
 	al_flip_display();
 
-   al_rest(10);
+   al_rest(3);
    end_program();
 
 	return 0;

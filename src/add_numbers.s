@@ -17,18 +17,32 @@ add_numbers:
     mov     DWORD [rbp - 32], r8d
 
 	mov r15, rdx
-
-	mov rax, 9
-	mov r11, rdx
 	xor r14, r14
-kernel_sum_loop:
-	movsx r10, DWORD [r11] 
-	add   r14, r10
+
+	movdqu xmm0, [rdx]
+	movdqu xmm1, [rdx + 16]
+	paddd  xmm0, xmm1
+	movdqa xmm1, xmm0
+	psrldq xmm1, 8
+	paddd  xmm0, xmm1
+	movdqa xmm1, xmm0
+	psrldq xmm1, 4
+	paddd  xmm0, xmm1
+	movd   r14d, xmm0
+	add    r14d, [rdx + 32]
+
+
+; 	mov rax, 9
+; 	mov r11, rdx
+; 	xor r14, r14
+; kernel_sum_loop:
+; 	movsx r10, DWORD [r11] 
+; 	add   r14, r10
 	
-	add r11, 4
-	dec  rax
-	test rax, rax
-	jnz kernel_sum_loop
+; 	add r11, 4
+; 	dec  rax
+; 	test rax, rax
+; 	jnz kernel_sum_loop
 	
 	; calculating number of byte we will have to process
 	lea r10, [ecx + ecx*2];width in bytes
