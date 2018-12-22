@@ -1,7 +1,7 @@
 SECTION .TEXT
-	GLOBAL add_numbers
+	GLOBAL filter_image
 
-add_numbers:
+filter_image:
 	push rbp
 	mov rbp, rsp
 	push r12
@@ -9,14 +9,16 @@ add_numbers:
 	push r14
 	push r15
 
-	sub rsp, 32
-	mov     QWORD [rbp - 8], rdi
-    mov     QWORD [rbp - 16], rsi
-    mov     QWORD [rbp - 24], rdx
-    mov     DWORD [rbp - 28], ecx
-    mov     DWORD [rbp - 32], r8d
+	; sub rsp, 32
+	; mov     QWORD [rbp - 8], rdi
+    ; mov     QWORD [rbp - 16], rsi
+    ; mov     QWORD [rbp - 24], rdx
+    ; mov     DWORD [rbp - 28], ecx
+    ; mov     DWORD [rbp - 32], r8d
 
-	mov r15, rdx
+	mov r15, rdx ; saving a pointer to kernel
+
+	;calculating sum of a kernel
 	xor r14, r14
 
 	movdqu xmm0, [rdx]
@@ -31,23 +33,15 @@ add_numbers:
 	movd   r14d, xmm0
 	add    r14d, [rdx + 32]
 
-
-; 	mov rax, 9
-; 	mov r11, rdx
-; 	xor r14, r14
-; kernel_sum_loop:
-; 	movsx r10, DWORD [r11] 
-; 	add   r14, r10
-	
-; 	add r11, 4
-; 	dec  rax
-; 	test rax, rax
-; 	jnz kernel_sum_loop
+	;making sure we are not dividing by zero
+	mov rax ,1
+	test r14d, r14d
+	cmovz r14, rax
 	
 	; calculating number of byte we will have to process
 	lea r10, [ecx + ecx*2];width in bytes
-	mov eax, r8d
-	sub eax, 2
+	lea eax, [r8d - 2]
+	; sub eax, 2
 	mul r10d
 
 	;saving the number into rcx - after mul value is in two registers

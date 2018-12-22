@@ -21,11 +21,11 @@ LIB=`pkg-config --libs allegro-5 allegro_image-5 allegro_dialog-5`
 
 $(TARGET): $(OBJECTS)
 	@mkdir -p bin
-	$(CC) $(CFLAGS) build/add_numbers.o build/glowny.o -o $(TARGET) $(LIB)
+	$(CC) $(CFLAGS) build/filter_image.o build/glowny.o -o $(TARGET) $(LIB)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo ; $(CC) $(CFLAGS) $(INC) $(LIB) -c -o $@ $<
-	$(ASM) $(ASMFLAGS) -o build/add_numbers.o src/add_numbers.s
+	$(ASM) $(ASMFLAGS) -o build/filter_image.o src/filter_image.s
 
 clean:
 	@echo " Cleaning..."; 
