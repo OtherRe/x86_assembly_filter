@@ -42,59 +42,34 @@ void init()
 
 void read_image_from_user()
 {
-   // al_destroy_bitmap(image);
-   // image = NULL;
-   // char name[100];
-   // do
-   // {
-   //    printf("Please give name of the image: ");
-   //    scanf("%s", name);
-   // } while (!image);
-      image = al_load_bitmap("test.bmp");
-   if(!image)
+   al_destroy_bitmap(image);
+   image = NULL;
+   char name[100];
+   do
    {
-      al_show_native_message_box(display, "Error", "Error", "Failed to load image!",
-                                 NULL, ALLEGRO_MESSAGEBOX_ERROR);
-      al_destroy_display(display);
-      exit(1);
-   }
+      printf("Please give name of the image: ");
+      scanf("%s", name);
+      image = al_load_bitmap(name);
+   } while (!image);
 }
 
-// void init_input_buffer(unsigned char* input_buffer, int height, int widthInBytes)
-// {
-//    input_buffer = (unsigned char*)malloc(height * widthInBytes);
-//    region=al_lock_bitmap(image, ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA, ALLEGRO_LOCK_READWRITE);
-//    memcpy(input_buffer, ((unsigned char*)(region->data)) - (height - 1 ) * widthInBytes, height * widthInBytes);
-//    al_unlock_bitmap(image);
-// }
 
 void end_program()
 {
-
    al_destroy_display(display);
    al_destroy_bitmap(image);
    al_shutdown_image_addon();
 }
 
-// void filter(unsigned char* output_buffer, unsigned char* input_buffer, int kernel[], int width, int height);
 void readKernel(int *kernel)
 {
-   // int value;
-   // printf("Please give a values for a kernel starting with bottom left corner:\n");
-   // for (int i = 0; i < 9; ++i)
-   // {
-   //    printf("Tile number %d: ", i + 1);
-   //    scanf("%d", &kernel[i]);
-   // }
-   kernel[0] = -1;
-   kernel[1] = -1;
-   kernel[2] = -1;
-   kernel[3] = -1;
-   kernel[4] = 19;
-   kernel[5] = -1;
-   kernel[6] = -1;
-   kernel[7] = -1;
-   kernel[8] = -1;
+   int value;
+   printf("Please give a values for a kernel starting with bottom left corner:\n");
+   for (int i = 0; i < 9; ++i)
+   {
+      printf("Tile number %d: ", i + 1);
+      scanf("%d", &kernel[i]);
+   }
 }
 
 int main(int argc, char *argv[])
@@ -102,7 +77,6 @@ int main(int argc, char *argv[])
    init();
 
    char control[10];
-   long a;
    while (true)
    {
       read_image_from_user();
@@ -121,17 +95,15 @@ int main(int argc, char *argv[])
          readKernel(kernel);
          region = al_lock_bitmap(image, ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA, ALLEGRO_LOCK_READWRITE);
 
-         a =filter_image((unsigned char *)(region->data) - 1, input_buffer + (height - 1) * widthInBytes - 1, kernel, width, height);
-         printf("%ld", a);
+         filter_image((unsigned char *)(region->data) - 1, input_buffer + (height - 1) * widthInBytes - 1, kernel, width, height);
          al_unlock_bitmap(image);
-         al_save_bitmap("result.bmp", image);
 
          al_draw_bitmap(image, 0, 0, 0);
          al_flip_display();
 
          printf("Do you want to try another kernel?(y/n) ");
          scanf("%s", control);
-         if (control[0] == 'y')
+         if (control[0] != 'y')
             break;
       }
 

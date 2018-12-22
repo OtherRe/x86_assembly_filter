@@ -110,8 +110,6 @@ next:
 	dec rcx
 	jnz filter_loop
 
-
-
 epilog:
 	pop r15
 	pop r14
