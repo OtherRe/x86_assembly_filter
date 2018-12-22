@@ -42,7 +42,6 @@ filter_image:
 	; calculating number of byte we will have to process
 	lea r10, [ecx + ecx*2];width in bytes
 	lea eax, [r8d - 2]
-	; sub eax, 2
 	mul r10d
 
 	;saving the number into rcx - after mul value is in two registers
@@ -97,7 +96,7 @@ kernel_row_loop:
 
 	xor   rdx, rdx; calculate the new value of pixel
 	mov rax, r9
-	idiv  r14
+	div  r14
 
 	mov   r8, 255
 	cmp   eax, r8d
