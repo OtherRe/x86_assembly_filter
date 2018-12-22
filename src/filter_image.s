@@ -33,11 +33,12 @@ filter_image:
 	movd   r14d, xmm0
 	add    r14d, [rdx + 32]
 
+
 	;making sure we are not dividing by zero
 	mov rax ,1
 	test r14d, r14d
-	cmovz r14, rax
-	
+	cmovs r14, rax
+
 	; calculating number of byte we will have to process
 	lea r10, [ecx + ecx*2];width in bytes
 	lea eax, [r8d - 2]
@@ -89,16 +90,20 @@ kernel_row_loop:
 	lea   r11, [r11 + r10]
 	jne kernel_row_loop
 
-	xor rdx, rdx; calculate the new value of pixel
-	mov rax, r9
-	idiv r14
 
-	mov   r8d, 255
+	xor rax, rax
+	test  r9d, r9d
+	js next
+
+	xor   rdx, rdx; calculate the new value of pixel
+	mov rax, r9
+	idiv  r14
+
+	mov   r8, 255
 	cmp   eax, r8d
 	cmovg eax, r8d
-	test  eax, eax
-	cmovs eax, edx;0
 
+next:
 	mov [rdi], al
 
 	dec rdi
