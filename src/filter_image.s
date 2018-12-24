@@ -9,13 +9,6 @@ filter_image:
 	push r14
 	push r15
 
-	; sub rsp, 32
-	; mov     QWORD [rbp - 8], rdi
-    ; mov     QWORD [rbp - 16], rsi
-    ; mov     QWORD [rbp - 24], rdx
-    ; mov     DWORD [rbp - 28], ecx
-    ; mov     DWORD [rbp - 32], r8d
-
 	mov r15, rdx ; saving a pointer to kernel
 
 	;calculating sum of a kernel
@@ -37,7 +30,7 @@ filter_image:
 	;making sure we are not dividing by zero
 	mov rax ,1
 	test r14d, r14d
-	cmovs r14, rax
+	cmovz r14, rax
 
 	; calculating number of byte we will have to process
 	lea r10, [ecx + ecx*2];width in bytes
