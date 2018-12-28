@@ -13,6 +13,21 @@ ALLEGRO_LOCKED_REGION *region = NULL;
 
 extern long filter_image(unsigned char *output_buffer, unsigned char *input_buffer, int *kernel, int width, int height);
 
+void init_display()
+{
+   if (display)
+      al_destroy_display(display);
+
+   display = al_create_display(1920, 1080);
+
+   if (!display)
+   {
+      al_show_native_message_box(display, "Error", "Error", "Failed to initialize display!",
+                                 NULL, ALLEGRO_MESSAGEBOX_ERROR);
+      exit(1);
+   }
+}
+
 void init()
 {
    al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA);
@@ -26,15 +41,6 @@ void init()
    if (!al_init_image_addon())
    {
       al_show_native_message_box(display, "Error", "Error", "Failed to initialize al_init_image_addon!",
-                                 NULL, ALLEGRO_MESSAGEBOX_ERROR);
-      exit(1);
-   }
-
-   display = al_create_display(1920, 1080);
-
-   if (!display)
-   {
-      al_show_native_message_box(display, "Error", "Error", "Failed to initialize display!",
                                  NULL, ALLEGRO_MESSAGEBOX_ERROR);
       exit(1);
    }
@@ -53,7 +59,6 @@ void read_image_from_user()
    } while (!image);
 }
 
-
 void end_program()
 {
    al_destroy_display(display);
@@ -61,14 +66,61 @@ void end_program()
    al_shutdown_image_addon();
 }
 
+void make_kernel(int *from, int *to)
+{
+   for (int i = 0; i < 9; i++)
+   {
+      to[i] = from[i];
+   }
+}
+
 void readKernel(int *kernel)
 {
+   int option;
    int value;
-   printf("Please give a values for a kernel starting with bottom left corner:\n");
-   for (int i = 0; i < 9; ++i)
+   printf("1) Mean filter\n");
+   printf("2) Gauss filter\n");
+   printf("3) Edge detection filter\n");
+   printf("4) No filter\n");
+   printf("5) Your filter\n");
+   scanf("%d", &option);
+   switch (option)
    {
-      printf("Tile number %d: ", i + 1);
-      scanf("%d", &kernel[i]);
+   case 1:
+   {
+      int k[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+      make_kernel(k, kernel);
+   }
+   break;
+   case 2:
+   {
+      int k[] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
+      make_kernel(k, kernel);
+
+   }
+   break;
+   case 3:
+   {
+      int k[] = {0, 1, 0, 1, -4, 1, 0, 1, 0};
+      make_kernel(k, kernel);
+   }
+   break;
+   case 4:
+   {
+      int k[] = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+      make_kernel(k, kernel);
+   }
+   break;
+   case 5:
+   {
+      printf("Please give a values for a kernel starting with bottom left corner:\n");
+      for (int i = 0; i < 9; ++i)
+      {
+         printf("Tile number %d: ", i + 1);
+         scanf("%d", &kernel[i]);
+      }
+   }
+   break;
    }
 }
 
@@ -79,6 +131,7 @@ int main(int argc, char *argv[])
    char control[10];
    while (true)
    {
+      init_display();
       read_image_from_user();
       int width = al_get_bitmap_width(image);
       int height = al_get_bitmap_height(image);
@@ -120,46 +173,3 @@ int main(int argc, char *argv[])
 
    return 0;
 }
-// int clamp(int toClamp, int low, int high)
-// {
-//    if(toClamp < low)
-//       return low;
-//    if(toClamp > high)
-//       return high;
-//    return toClamp;
-// }
-
-// void filter(unsigned char* output_buffer, unsigned char* input_buffer, int* kernel, int width, int height)
-// {
-//    int widthInBytes = width * 3;
-//    int c_height;
-//    int c_width;
-//    int accumulator;
-//    int kernel_sum;
-//    int i;
-//    for(i = 0; i < 9; i++)
-//       kernel_sum+=kernel[i];
-
-//    for(c_height = 2; c_height < height; ++c_height)
-//    {
-//       for(c_width = 0; c_width < widthInBytes; ++c_width, --input_buffer, --output_buffer)
-//       {
-//          accumulator = 0;
-
-//          accumulator = accumulator + (input_buffer[-widthInBytes + 3] * kernel[8]);
-//          accumulator = accumulator + (input_buffer[-widthInBytes] * kernel[7]);
-//          accumulator = accumulator + (input_buffer[-widthInBytes - 3] * kernel[6]);
-
-//          accumulator = accumulator + (input_buffer[3] * kernel[5]);
-//          accumulator = accumulator + (input_buffer[0] * kernel[4]);
-//          accumulator = accumulator + (input_buffer[-3] * kernel[3]);
-
-//          accumulator = accumulator + (input_buffer[widthInBytes + 3] * kernel[2]);
-//          accumulator = accumulator + (input_buffer[widthInBytes] * kernel[1]);
-//          accumulator = accumulator + (input_buffer[widthInBytes - 3] * kernel[0]);
-
-//          output_buffer[0] = clamp(accumulator / kernel_sum, 0, 255);
-//       }
-//    }
-
-// }
